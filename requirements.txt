@@ -1,4 +1,6 @@
-streamlit
-googletrans==4.0.0-rc1
-pyttsx3
-pyperclip
+streamlit==1.65.0
+deep-translator==1.11.4
+gTTS==2.5.4
+langdetect==1.0.9
+# gTTS 2.5.4 requires click<8.2; pinned so pip doesn't pick a newer click for Streamlit.
+click==8.1.8
