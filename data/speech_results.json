@@ -1,0 +1,98 @@
+{
+ "n": 200,
+ "asr": {
+  "en": {
+   "clips": 40,
+   "wer": 0.09259259259259259,
+   "cer": 0.041742286751361164,
+   "language_id": 1.0
+  },
+  "es": {
+   "clips": 40,
+   "wer": 0.09236947791164658,
+   "cer": 0.025824463444425058,
+   "language_id": 1.0
+  },
+  "fr": {
+   "clips": 40,
+   "wer": 0.2517543859649123,
+   "cer": 0.10379429288178112,
+   "language_id": 1.0
+  },
+  "de": {
+   "clips": 40,
+   "wer": 0.15271966527196654,
+   "cer": 0.04569150567310641,
+   "language_id": 0.975
+  },
+  "hi": {
+   "clips": 40,
+   "wer": 1.0598859315589353,
+   "cer": 0.901505048580682,
+   "language_id": 0.85
+  }
+ },
+ "translation": {
+  "es": {
+   "clips": 40,
+   "paired_clips": 40,
+   "whisper-direct (all clips)": {
+    "chrf": 45.47414666686876,
+    "bleu": 13.56476465730349
+   },
+   "cascade": {
+    "chrf": 56.69671308937172,
+    "bleu": 26.591973660176375
+   },
+   "whisper-direct": {
+    "chrf": 45.47414666686876,
+    "bleu": 13.56476465730349
+   },
+   "text-only": {
+    "chrf": 61.24817317439594,
+    "bleu": 34.12084666107053
+   }
+  },
+  "fr": {
+   "clips": 40,
+   "paired_clips": 10,
+   "whisper-direct (all clips)": {
+    "chrf": 45.49031920863229,
+    "bleu": 14.483928774076608
+   },
+   "cascade": {
+    "chrf": 53.37685072308766,
+    "bleu": 22.708397833808966
+   },
+   "whisper-direct": {
+    "chrf": 42.226574195952246,
+    "bleu": 10.548616542424503
+   },
+   "text-only": {
+    "chrf": 66.20100151045537,
+    "bleu": 35.61991573139667
+   }
+  },
+  "de": {
+   "clips": 40,
+   "paired_clips": 0,
+   "whisper-direct (all clips)": {
+    "chrf": 46.415727625057876,
+    "bleu": 16.075472692874673
+   }
+  },
+  "hi": {
+   "clips": 40,
+   "paired_clips": 0,
+   "whisper-direct (all clips)": {
+    "chrf": 28.722619258794907,
+    "bleu": 3.5458460585500493
+   }
+  }
+ },
+ "speed": {
+  "audio_seconds": 2352.7,
+  "processing_seconds": 764.5,
+  "real_time_factor": 0.3249577088841096
+ }
+}

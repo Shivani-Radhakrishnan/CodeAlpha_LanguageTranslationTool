@@ -1,2 +1,5 @@
 -r requirements.txt
 pytest==9.1.1
+# Speech evaluation metrics (eval/speech_eval.py); Whisper itself is not needed for the tests
+jiwer==4.0.0
+sacrebleu==2.5.1

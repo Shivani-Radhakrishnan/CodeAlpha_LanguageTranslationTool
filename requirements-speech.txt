@@ -1,0 +1,5 @@
+# Optional: speech-to-speech translation (record or upload speech in any language).
+# faster-whisper runs Whisper on CTranslate2 (int8, CPU); no PyTorch. The "base" model
+# (~145 MB) is downloaded on first use.
+-r requirements.txt
+faster-whisper==1.2.1

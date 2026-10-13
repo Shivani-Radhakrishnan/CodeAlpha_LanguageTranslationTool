@@ -8,6 +8,7 @@ this file only handles layout and session state.
 
 from __future__ import annotations
 
+import hashlib
 import html
 import logging
 from datetime import datetime
@@ -45,6 +46,21 @@ def get_service() -> TranslationService:
     return TranslationService()
 
 
+def speech_available() -> bool:
+    try:
+        import faster_whisper  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
+@st.cache_resource(show_spinner="Loading the speech-recognition model (first time: ~145 MB download)...")
+def get_transcriber():
+    from translation_tool.asr import Transcriber
+
+    return Transcriber()
+
+
 @st.cache_data(show_spinner=False, max_entries=64)
 def speak(text: str, lang: str) -> bytes:
     """Cached text-to-speech so replaying a translation costs no request."""
@@ -62,6 +78,9 @@ def init_state() -> None:
         "result": None,
         "audio": None,
         "history": [],
+        "spoken": None,
+        "spoken_key": None,
+        "speak_tgt": config.DEFAULT_TARGET,
     }
     for key, value in defaults.items():
         st.session_state.setdefault(key, value)
@@ -200,16 +219,7 @@ def render_sidebar(service: TranslationService) -> None:
         )
 
 
-def main() -> None:
-    st.markdown(CSS, unsafe_allow_html=True)
-    init_state()
-    service = get_service()
-    render_sidebar(service)
-
-    st.markdown("## 🌐 Language Translation Tool")
-    st.caption("Auto-detect, swap languages, listen, download, and keep a history of your translations.")
-
-    codes = list(languages())
+def render_type_tab(codes: list[str]) -> None:
     left, mid, right = st.columns([5, 1, 5], vertical_alignment="bottom")
     left.selectbox("From", [AUTO, *codes], key="src", format_func=name_of)
     mid.button("⇄", on_click=swap_languages, help="Swap languages", use_container_width=True)
@@ -241,6 +251,67 @@ def main() -> None:
 
     if st.session_state.result is not None:
         render_result(st.session_state.result)
+
+
+def render_speak_tab(codes: list[str]) -> None:
+    """Speech-to-speech: record or upload speech in any language, hear it in the target language."""
+    if not speech_available():
+        st.info("Speech input needs the optional speech-recognition package: "
+                "`pip install -r requirements-speech.txt`.")
+        return
+    st.selectbox("Translate into", codes, key="speak_tgt", format_func=name_of)
+    st.caption("Speak in any of Whisper's ~100 languages; it detects which one by itself.")
+    recorded = st.audio_input("Record")
+    uploaded = st.file_uploader("…or upload an audio file", type=["wav", "mp3", "m4a", "ogg", "flac", "webm"])
+    clip = recorded or uploaded
+    if clip is None:
+        return
+    audio = clip.getvalue()
+    key = hashlib.sha1(audio + st.session_state.speak_tgt.encode()).hexdigest()
+    if st.session_state.spoken_key != key:
+        from translation_tool.asr import SpeechRecognitionError
+        from translation_tool.voice import speech_to_speech
+
+        try:
+            with st.spinner("Listening and translating…"):
+                st.session_state.spoken = speech_to_speech(
+                    audio, st.session_state.speak_tgt, get_transcriber(), get_service(),
+                    lambda text, lang: speak(text, lang) if tts_code(lang) else None)
+            st.session_state.spoken_key = key
+        except SpeechRecognitionError as exc:
+            st.warning(str(exc))
+            return
+        except (InputError, TranslationError, SpeechError) as exc:
+            st.error(str(exc), icon="⚠️")
+            return
+    spoken = st.session_state.spoken
+    heard = spoken.transcript
+    with st.container(border=True):
+        st.markdown(f'<span class="meta">Heard ({name_of(heard.language)}, '
+                    f'{heard.language_probability:.0%} sure)</span>', unsafe_allow_html=True)
+        st.markdown(f'<div class="result">{as_html(heard.text)}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="result"><b>{as_html(spoken.translation.text)}</b></div>', unsafe_allow_html=True)
+    if spoken.audio:
+        st.audio(spoken.audio, format="audio/mp3", autoplay=True)
+    else:
+        st.caption("Text-to-speech isn't available for this language.")
+
+
+def main() -> None:
+    st.markdown(CSS, unsafe_allow_html=True)
+    init_state()
+    service = get_service()
+    render_sidebar(service)
+
+    st.markdown("## 🌐 Language Translation Tool")
+    st.caption("Type or speak, translate between 100+ languages, listen, download, and keep a history.")
+
+    codes = list(languages())
+    type_tab, speak_tab = st.tabs(["⌨️ Type", "🎙️ Speak"])
+    with type_tab:
+        render_type_tab(codes)
+    with speak_tab:
+        render_speak_tab(codes)
 
     st.divider()
     render_history()
