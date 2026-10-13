@@ -84,8 +84,20 @@ def test_published_speech_results_reproduce_from_recorded_outputs():
     rows = speech_eval.load_manifest()
     outputs = json.loads(speech_eval.OUTPUTS.read_text(encoding="utf-8"))
     now = speech_eval.compute(rows, outputs)
-    assert now["asr"] == published["asr"]
-    assert now["translation"] == published["translation"]
+    _close(now["asr"], published["asr"])
+    _close(now["translation"], published["translation"])
+
+
+def _close(a, b, path="") -> None:
+    """Equal up to floating-point noise (metric libraries differ in the last digits across platforms)."""
+    if isinstance(a, dict):
+        assert a.keys() == b.keys(), path
+        for k in a:
+            _close(a[k], b[k], f"{path}.{k}")
+    elif isinstance(a, float):
+        assert a == pytest.approx(b, abs=1e-6), path
+    else:
+        assert a == b, path
 
 
 def test_wer_normalisation():
