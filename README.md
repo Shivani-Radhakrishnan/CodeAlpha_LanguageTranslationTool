@@ -1,10 +1,12 @@
-# 🌐 Language Translation Tool
+# Speech Translator
 
-[![tests](https://github.com/Shivani-Radhakrishnan/CodeAlpha_LanguageTranslationTool/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Shivani-Radhakrishnan/CodeAlpha_LanguageTranslationTool/actions/workflows/tests.yml)
+[![tests](https://github.com/Shivani-Radhakrishnan/speech-translator/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Shivani-Radhakrishnan/speech-translator/actions/workflows/tests.yml)
 
-A Streamlit app that translates text between 100+ languages. It can detect the source language, read the translation aloud in the browser, and save it as a file. Behind the UI is a small, typed service layer. It tries each translation service in turn, retries failed requests, puts a time limit on each one, caches results, and shows a clear message when the network is down. A pytest suite covers it with all network calls mocked. Built for the CodeAlpha internship.
+A Streamlit app for **speech-to-speech and text translation** in about 100 languages. Record yourself and hear the translation: Whisper (running locally, no PyTorch) works out which language you spoke and transcribes it, the text is translated, and the result is read aloud. On 200 recordings from the FLEURS benchmark, Whisper base gets **9.2% word error rate in Spanish and 9.3% in English**, and recognising speech then translating it beats Whisper's own built-in translation by **11 chrF points** on Spanish.
 
-It also does **speech-to-speech**: record yourself in any of about 100 languages and hear the translation. Whisper (running locally, no PyTorch) works out which language you spoke, the text is translated, and the result is read aloud. On 200 recordings from the FLEURS benchmark, Whisper base gets **9.2% word error rate in Spanish and 9.3% in English**, and recognising speech then translating it beats Whisper's own built-in translation by **11 chrF points** on Spanish.
+Typed text works too: it detects the source language, reads the translation aloud in the browser, and saves it as a file. Behind the UI is a small, typed service layer. It tries each translation service in turn, retries failed requests, puts a time limit on each one, caches results, and shows a clear message when the network is down. A pytest suite covers it with all network calls mocked.
+
+*Background: started as a project for the CodeAlpha internship and extended since.*
 
 ![Screenshot of the app translating Spanish to English](assets/screenshot.png)
 
@@ -15,7 +17,7 @@ It also does **speech-to-speech**: record yourself in any of about 100 languages
 - **Auto-detect** the source language, shown with a confidence score ("Detected Spanish (100%)").
 - **Swap languages (⇄)**: the translation moves into the input box. This also works after auto-detect, using the detected language.
 - **Character counter** with a 5,000-character limit and input validation.
-- **Listen 🔊**: [gTTS](https://pypi.org/project/gTTS/) creates an MP3 that plays in the browser.
+- **Listen**: [gTTS](https://pypi.org/project/gTTS/) creates an MP3 that plays in the browser.
 - **Download .txt** and **Copy text** for the translation.
 - **History** of the last 10 translations in the session, with *Use again* and *Clear*.
 - **Line breaks kept**, so paragraphs stay paragraphs.
@@ -24,7 +26,7 @@ It also does **speech-to-speech**: record yourself in any of about 100 languages
 
 ## Speech-to-speech
 
-The **🎙️ Speak** tab records from the microphone (or takes an audio file), then:
+The **Speak** tab records from the microphone (or takes an audio file), then:
 
 ```
 speech ──► Whisper base (faster-whisper / CTranslate2, int8 on CPU; ~145 MB)
@@ -114,8 +116,8 @@ TranslationService.translate(text, source, target)
 ## Quick start
 
 ```bash
-git clone https://github.com/Shivani-Radhakrishnan/CodeAlpha_LanguageTranslationTool.git
-cd CodeAlpha_LanguageTranslationTool
+git clone https://github.com/Shivani-Radhakrishnan/speech-translator.git
+cd speech-translator
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 pip install -r requirements-speech.txt   # optional: the Speak tab (faster-whisper)
